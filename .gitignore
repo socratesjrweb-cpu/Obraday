@@ -1,0 +1,5 @@
+# dados do sistema (usuários, sessões, obras, medições, anexos) — ficam só no servidor, com backup
+dados/
+config.json
+*.tmp
+node_modules/

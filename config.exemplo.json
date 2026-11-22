@@ -1,0 +1,32 @@
+{
+  "marca": {
+    "nome": "Gestão de Obras",
+    "sufixo": "ENGENHARIA",
+    "slogan": "",
+    "empresa": "Minha Construtora Ltda",
+    "logo": "",
+    "cores": { "escuro": "#0f172a", "acento": "#2563eb", "acentoClaro": "#93c5fd", "acentoEscuro": "#1e40af", "fundo": "#f5f7fa" }
+  },
+  "servidor": { "porta": 4700, "host": "127.0.0.1", "https": false },
+  "dados": "dados",
+  "email": { "host": "smtp.seuprovedor.com.br", "porta": 465, "seguro": true, "usuario": "sistema@suaempresa.com.br", "remetente": "sistema@suaempresa.com.br" },
+  "plotadores": [
+    { "id": "plotagem", "nome": "Plotagem", "email": "plotagem@suaempresa.com.br" }
+  ],
+  "municipios": [
+    {
+      "id": "minha-cidade",
+      "nome": "Minha Cidade",
+      "validadeAnos": 2,
+      "documentos": [
+        "Requerimento de renovação assinado pelo proprietário ou procurador",
+        "Cópia do alvará de construção a renovar",
+        "Projeto aprovado (cópia)",
+        "ART/RRT de execução da obra em vigor",
+        "Matrícula atualizada do imóvel",
+        "Certidão negativa de débitos municipais do imóvel",
+        "Comprovante de pagamento da taxa de renovação"
+      ]
+    }
+  ]
+}

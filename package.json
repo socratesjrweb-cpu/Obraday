@@ -1,0 +1,11 @@
+{
+  "name": "gestao-obras",
+  "private": true,
+  "type": "module",
+  "description": "Sistema de engenharia: Medições, Projetos e Documentos & Incorporações. Sem dependências — só Node 20 ou mais novo.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "conferir": "node ferramentas/conferir.mjs"
+  }
+}
