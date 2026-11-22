@@ -14,6 +14,7 @@
 // Boletim: valor BRUTO. Pagamento/retenção é do RH e do financeiro.
 // Nada some: remover só marca, e o histórico guarda quem e quando. A versão anterior (medicoes/*.json) só é LIDA.
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync, readdirSync } from "node:fs";
+import { lerEstrutura, gravarEstrutura } from "./estrutura.js";
 import { join } from "node:path";
 import { randomBytes, createHash } from "node:crypto";
 import { DIR_SETORES, DIR_ANEXOS, isoLocal, agoraLocalISO } from "../ponte-engenharia.js";
@@ -126,7 +127,28 @@ export function lerObra(obra) {
   O.boletins = O.boletins.filter(B => (B.itens || []).length || (B.extras || []).length || (B.versoes || []).length);
   for (const B of O.boletins) for (const V of B.versoes || []) if (!V.codigo) V.codigo = codigoVersao(B, V);
   for (const B of O.boletins) { unicos(B.itens); for (const V of B.versoes || []) unicos(V.itens); }
+  comEstrutura(obra, O);
   return O;
+}
+// ---- ESTRUTURA CENTRAL (22/11): grupos, pavimentos e locais moram no cadastro da obra (estrutura.js), não mais aqui.
+// Ao ler, a obra recebe a estrutura central (a 1ª vez, a estrutura que já estava na Medição vai para lá, com os mesmos ids).
+// Ao gravar, se a Medição mexeu na estrutura, a mudança vai para o cadastro central; obra NOVA (do zero ou da planilha)
+// junta a dela com a que já estava cadastrada. O arquivo da obra continua com uma cópia (serve de reserva).
+const CAMPOS_EST = ["grupos", "pavimentos", "locais"];
+const fotoEst = O => JSON.stringify(CAMPOS_EST.map(k => O[k] || []));
+function comEstrutura(obra, O) {
+  let E = lerEstrutura(obra);
+  if (!E) { E = gravarEstrutura(obra, { grupos: O.grupos, pavimentos: O.pavimentos, locais: O.locais }, null, "Estrutura trazida da Medição (cadastro central da obra)"); }
+  for (const k of CAMPOS_EST) O[k] = JSON.parse(JSON.stringify(E[k] || []));
+  Object.defineProperty(O, "_est", { value: fotoEst(O), enumerable: false, writable: true, configurable: true });
+}
+function sincronizarEstrutura(obra, O, user, t) {
+  if (O._est === undefined) {                               // obra que não veio do lerObra: começar do zero, planilha
+    const E = lerEstrutura(obra);
+    if (E) for (const k of CAMPOS_EST) { const ids = new Set((E[k] || []).map(x => x.id)); O[k] = [...(E[k] || []), ...(O[k] || []).filter(x => !ids.has(x.id))]; }
+    if (!E || fotoEst(O) !== fotoEst(E)) gravarEstrutura(obra, O, user, `Medição: ${t}`);
+  } else if (fotoEst(O) !== O._est) gravarEstrutura(obra, O, user, `Medição: ${t}`);
+  O._est = fotoEst(O);
 }
 /** Grava a obra e a linha do Histórico — com os DETALHES do que mudou (compara com o que está gravado; ver medicao-detalhes.js).
  *  Se a comparação falhar por qualquer motivo, grava assim mesmo, só sem os detalhes: o histórico nunca impede salvar. */
@@ -147,6 +169,7 @@ function gravarObra(obra, O, user, t, extraDet = []) {
     const nomes = { cat: new Map(lerCatalogo().servicos.map(c => [c.id, c])), emp: new Map(lerEmpreiteiros().lista.map(e => [e.id, e.nome])) };
     const det = [...extraDet, ...detalhar(existsSync(arqObra(obra)) ? lerObra(obra) : null, O, nomes)]; if (det.length) n.det = det;
   } catch { if (extraDet.length) n.det = extraDet; }
+  sincronizarEstrutura(obra, O, user, t);
   O.historico.push(n); gravarJSON(arqObra(obra), O);
 }
 const abrir = obra => { const O = lerObra(obra); return O ? { O } : { erro: "Esta obra ainda não começou na medição nova." }; };

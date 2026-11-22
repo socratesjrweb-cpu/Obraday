@@ -11,6 +11,8 @@ import { camposAnexoAlvara, gravarAlvara, verificarAvisoSemanal } from "./projet
 import { camposAnexoDocObra, gravarDocObra } from "./projetos-docobra.js";
 import { paginaEntrada as medEntrada, paginaObra as medObra, paginaLancar as medLancar, paginaBoletim, pdfBoletim as medPdf, paginaPdfBoletim as medPdfTela, nomeArquivoBoletim as medNomePdf, paginaEmpreiteiros as medEmpreiteiros, paginaAssinar as medAssinar, mandarAoEmpreiteiro as medMandar, paginaPlanilha as medPlanilha, paginaServicos as medServicos, paginaRH as medRH, paginaAcesso as medAcesso, receberPlanilha as medRecebePlanilha, confirmarPlanilha as medConfirmaPlanilha } from "./medicao-telas.js";
 import * as MED from "./medicao-dados.js";
+import { rotaContratos } from "./contratos.js";
+import { rotaEmpreendimentos } from "./empreendimentos.js";
 import { paginaDocumentos, paginaDocumentosObra, enviarDocumentos, removerDocumento as removerDocProjeto, arquivoDocumento, paginaLocais, salvarLocal, liberarDocumento, paginaPainel, trocarResponsavel, paginaTipos, salvarTipo, carimbarDocumento, paginaChat, postarChat, acaoChat, imagemChat, paginaProjetistas, salvarProjetistas,
   paginaCompatEntrada, paginaCompat, postarCompat, acaoCompat, imagemCompat, salvarAlinhamento, salvarCalibracao, salvarReferencia } from "./documentos.js";
 import { paginaLote, enviarLote } from "./documentos-lote.js";
@@ -192,6 +194,10 @@ export async function rotear({ req, res, path, u, sess, html, redir, lerBody, NA
     return html(res, paginaObra(sess.user, id, u.searchParams.get("e") || u.searchParams.get("m") || ""));
   }
 
+  // ---- Cadastro central da obra (22/11): dados, ficha técnica e a estrutura do empreendimento
+  if (path === "/empreendimentos" || path.startsWith("/empreendimentos/")) return rotaEmpreendimentos({ req, res, path, u, sess, html, redir, lerBody, NAO });
+  // ---- Medição por contrato (22/11): prestador + itens do contrato, medição em % ou quantidade, saldo e histórico
+  if (path === "/obras/contratos" || path.startsWith("/obras/contratos/")) return rotaContratos({ req, res, path, u, sess, html, redir, NAO });
   if (path === "/obras" || path === "/obras/medicoes") return redir(res, "/obras/medicao");
 
   // ---- Documentos (21/10): projetos das 10 obras, upload com nomenclatura, revisões, marcações e acesso externo

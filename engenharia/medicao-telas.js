@@ -455,7 +455,7 @@ function mcGuardaRolagem(){ try{ sessionStorage.setItem('mcRolagem', location.pa
   var y=+p[1]; var ir=function(){ window.scrollTo(0,y); }; if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',ir); else ir(); }catch(e){} })();
 </script>`;
 
-const MSG = { imp: "Obra trazida da versão anterior. Confira a estrutura e os números.", zero: "Obra começada do zero. Cadastre os pavimentos e os locais na aba Estrutura.",
+const MSG = { imp: "Obra trazida da versão anterior. Confira a estrutura e os números.", zero: "Obra começada do zero. Os pavimentos e os locais vêm do cadastro da obra (painel Obras); aqui na aba Estrutura você põe os serviços.",
   lanc: "Medição lançada no boletim do mês de cada empreiteiro. Confira e envie para aprovação.", lancre: "Medição lançada. Atenção: boletim que já estava enviado ou aprovado voltou para \"em aberto\" — envie de novo.",
   impp: "Obra importada da planilha. Confira o Dashboard e os boletins.", recom: "Obra recomeçada: o arquivo anterior ficou guardado no servidor.",
   env: "Boletim enviado. Está na aba Aprovação, esperando a engenharia.", a: "Aprovado.", dev: "Boletim devolvido para correção, com o motivo.",
@@ -919,20 +919,19 @@ function abaEstrutura(R, user, q) {
   // ---- a árvore: Grupo › Pavimento › Local › Serviços (grupos abertos; pavimentos e locais fechados, a não ser o que se acabou de mexer)
   const nodoLocal = (p, l) => `<details class="mc-ar l" data-ak="est|${obra}|${esc(l.id)}"${locQ && locQ.id === l.id ? " open data-forca" : ""}>
     <summary><span class="mc-seta">▸</span><span class="nm">${esc(l.nome)}</span><small>${l.itens.length} serviço${l.itens.length === 1 ? "" : "s"}${l.total ? " · " + pct(l.medido / l.total) + " medido" : ""}</small>
-      <span class="ac">${maisServ("l", l.id, "Adicionar serviço neste local")}${mover("loc-mover", l.id, `<input type="hidden" name="pav" value="${esc(p.id)}">`)}</span></summary>
+      <span class="ac">${maisServ("l", l.id, "Adicionar serviço neste local")}</span></summary>
     <div class="in">${tabelaServ(p, l)}</div></details>`;
   const nodoPav = p => { const ls = locaisDe(p), ns = ls.reduce((a, l) => a + l.itens.length, 0);
     return `<details class="mc-ar p" data-ak="est|${obra}|${esc(p.id)}"${pavQ && pavQ.id === p.id ? " open data-forca" : ""}>
     <summary><span class="mc-seta">▸</span><span class="nm">${esc(p.nome)}</span><small>${ls.length} ${ls.length === 1 ? "local" : "locais"} · ${ns} serviço${ns === 1 ? "" : "s"}</small>
-      <span class="ac">${mover("pav-mover", p.id, "", ["sobe", "desce"])}</span></summary>
+      </summary>
     <div class="in">${ls.map(l => nodoLocal(p, l)).join("") || `<div class="oc-vazio" style="margin:4px 0">Nenhum local neste pavimento.</div>`}
-      ${!est ? "" : `<div class="mc-pvf"><form method="POST" action="${b}/local"><input type="hidden" name="pav" value="${esc(p.id)}"><input name="nome" placeholder="Local novo (ex.: Apto 05)" class="mc-i" required><button class="mc-mini">+ local</button></form>
-        <form method="POST" action="${b}/pav-nome"><input type="hidden" name="id" value="${esc(p.id)}"><input name="nome" value="${esc(p.nome)}" class="mc-i" required><button class="mc-mini">renomear</button></form></div>`}</div></details>`; };
+      </div></details>`; };
   const arvore = blocos.map(({ g, pavs }) => {
-    const dentro = pavs.map(nodoPav).join("") || (g ? `<div style="font-size:12px;color:var(--mut);padding:4px 2px">vazio <form method="POST" action="${b}/grupo-remover" style="display:inline"><input type="hidden" name="id" value="${esc(g.id)}"><button class="mc-mini">remover o grupo</button></form></div>` : "");
+    const dentro = pavs.map(nodoPav).join("") || (g ? `<div style="font-size:12px;color:var(--mut);padding:4px 2px">vazio</div>` : "");
     if (!vivosGr.length) return dentro;
-    return `<details class="mc-grl" open data-gk="est|${obra}|${g ? esc(g.id) : "sem"}"${pavQ && pavs.some(p => p.id === pavQ.id) ? " data-forca" : ""}><summary class="grt"><span class="mc-seta">▸</span><span style="flex:1">${g ? esc(g.nome) : "Sem grupo"} <small>${pavs.length} pavimento${pavs.length === 1 ? "" : "s"}</small></span>${g ? mover("grupo-mover", g.id, "", ["sobe", "desce"]) : ""}</summary>
-      <div class="mc-arg">${dentro}</div></details>`; }).join("") || `<div class="oc-vazio">Nenhum pavimento ainda. Comece por “Adicionar pavimentos”.</div>`;
+    return `<details class="mc-grl" open data-gk="est|${obra}|${g ? esc(g.id) : "sem"}"${pavQ && pavs.some(p => p.id === pavQ.id) ? " data-forca" : ""}><summary class="grt"><span class="mc-seta">▸</span><span style="flex:1">${g ? esc(g.nome) : "Sem grupo"} <small>${pavs.length} pavimento${pavs.length === 1 ? "" : "s"}</small></span></summary>
+      <div class="mc-arg">${dentro}</div></details>`; }).join("") || `<div class="oc-vazio">Nenhum pavimento ainda. A estrutura (pavimentos e locais) é cadastrada no <a href="/empreendimentos/${encodeURIComponent(O.obra)}" style="text-decoration:underline">cadastro da obra</a>.</div>`;
   // ---- a janela "Adicionar serviço": serviço entra SEMPRE num LOCAL. Opcional: replicar nos pavimentos tipo iguais — a regra da planilha:
   //      o pavimento tipo é o nome antes do número ("Tipo 01" → "Tipo"); vai para o local de MESMO NOME em cada pavimento com o mesmo começo.
   //      Antes de gravar, a janela mostra a lista de onde vai entrar (dá para desmarcar) e pede a confirmação.
@@ -1011,8 +1010,7 @@ function abaEstrutura(R, user, q) {
       <div class="bt" style="margin:0"><button type="button" class="oc-btn" onclick="this.closest('dialog').close()">Fechar</button></div></div>`);
   const abre = id => `onclick="document.getElementById('${id}').showModal()"`;
   const topo = `<div class="oc-barra" style="margin-bottom:6px"><button type="button" class="oc-btn" onclick="mcMxAbre()" title="Tabela com todos os serviços, para mudar muitas quantidades de uma vez">✎ Editar quantidades em massa</button></div><div class="oc-barra">${!est ? `<span style="font-size:12.5px;color:var(--mut)">A estrutura da obra é mexida pela engenharia (Gerente, Administrador) ou pela Diretoria — aqui você só vê.</span>` : `<button type="button" class="oc-btn p mc-novo" onclick="mcServ('')">Adicionar serviço</button>
-    <button type="button" class="oc-btn" ${abre("mcDlgPav")}>+ Pavimentos</button><button type="button" class="oc-btn" ${abre("mcDlgLoc")}>+ Locais</button>
-    <button type="button" class="oc-btn" ${abre("mcDlgGr")}>Grupos de pavimentos${semGrupo.length && R.pavs.length && vivosGr.length ? ` <span class="oc-tag">${semGrupo.length} sem grupo</span>` : ""}</button>`}
+    <a class="oc-btn" href="/empreendimentos/${encodeURIComponent(O.obra)}" title="Pavimentos, locais e grupos ficam no cadastro central da obra">🏗️ Pavimentos e locais (cadastro da obra)</a>`}
     <span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="mc-mini" onclick="mcArTodos(true)">abrir os pavimentos</button><button type="button" class="mc-mini" onclick="mcArTodos(false)">recolher tudo</button>${btnExp}</span></div>`;
   // (o "Modelo de unidade" saiu da tela em 10/11: não é útil para a engenharia. Os dados de modelos já
   //  gravados continuam no arquivo da obra; só não aparecem.)

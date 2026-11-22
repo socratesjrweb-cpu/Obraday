@@ -54,6 +54,7 @@ const tem = (u, s) => u.setores.includes("*") || u.setores.includes(s);
 const ehPdfDeBoletim = path => /^\/obras\/medicao\/[^/]+\/boletim\/[^/]+\/pdf$/.test(path);
 function podeEntrar(u, path, metodo) {
   if (u.nivel === "externo") return path === "/documentos" || path.startsWith("/documentos/");
+  if (path === "/empreendimentos" || path.startsWith("/empreendimentos/")) return tem(u, "obras") || tem(u, "projetos");   // cadastro central da obra (22/11)
   if (path === "/projetos" || path.startsWith("/projetos/")) return tem(u, "projetos");
   if (path === "/documentos" || path.startsWith("/documentos/")) return tem(u, "documentos");
   if (path === "/obras/medicao-rh") return tem(u, "obras") || tem(u, "rh");

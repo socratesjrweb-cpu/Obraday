@@ -10,8 +10,10 @@ const tem = (user, s) => user.setores.includes("*") || user.setores.includes(s);
 // ---------------------------------------------------------------- página inicial
 export function paginaInicial(user) {
   const cards = [];
+  if (tem(user, "obras") || tem(user, "projetos")) cards.push(["/empreendimentos", "🏗️", "Obras", "Cadastro da obra: dados, ficha técnica e a estrutura do empreendimento (torres, pavimentos e locais) usada nas outras áreas."]);
   if (tem(user, "projetos")) cards.push(["/projetos", "📐", "Documentos & Incorporações", "Ficha técnica, alvarás, documentos e andamento da incorporação de cada obra."]);
   if (tem(user, "obras")) cards.push(["/obras/medicao", "📏", "Medições", "Estrutura da obra, lançamento, boletins do mês, aprovação e assinatura do empreiteiro."]);
+  if (tem(user, "obras")) cards.push(["/obras/contratos", "📝", "Medição Contratos", "Contratos por prestador: serviços, valores, medição em % ou quantidade, saldo e histórico."]);
   if (tem(user, "documentos")) cards.push(["/documentos", "📑", "Projetos", "Pranchas: revisões, liberação para a obra, chat com projetistas, compatibilização e plotagens."]);
   if (tem(user, "rh") || user.nivel === "master") cards.push(["/obras/medicao-rh", "🧾", "Painel do RH", "Boletins do mês de todas as obras: aprovado, falta assinatura e total."]);
   if (user.nivel === "master") cards.push(["/admin", "⚙️", "Administração", "Usuários, perfis e o cadastro de obras."]);

@@ -6,7 +6,7 @@ import { enviarEmail, emailConfigurado } from "./nucleo/email.js";
 export { shell, cabecalhoPagina, obraBonita, unidadeCurta, linkPDF, seloPDF, MARCA } from "./nucleo/brand.js";
 export { ACCEPT, salvarArquivo, nomeSeguro, lerFormulario, LIMITE_LOTE, LIMITE_BYTES, LIMITE_IFC, tipoDoArquivo } from "./nucleo/upload.js";
 export { isoLocal, agoraLocalISO } from "./nucleo/datas.js";
-export { DIR_SETORES, DIR_ANEXOS, OBRAS_DOCS } from "./nucleo/obras.js";
+export { DIR_SETORES, DIR_ANEXOS, OBRAS_DOCS, listarObras, salvarObra } from "./nucleo/obras.js";
 
 /** Cores da marca em hexadecimal, para o que é desenhado em PDF (lá não existe var(--…)). */
 export const CORES_PDF = CONFIG.marca.cores;

@@ -68,11 +68,11 @@ try {
 
   const TELAS = {
     admin: ["/app", "/admin", "/projetos", `/projetos/${OBRA}`, "/obras/medicao", `/obras/medicao/${OBRA}`, ...["resumo", "estrutura", "boletins", "aprovacao", "precos", "empreiteiros"].map(a => `/obras/medicao/${OBRA}?aba=${a}`),
-      `/obras/medicao/${OBRA}/lancar`, `/obras/medicao/${OBRA}/planilha`, "/obras/medicao-rh", "/obras/medicao-acesso", "/obras/medicao-servicos", "/obras/medicao-empreiteiros",
+      `/obras/medicao/${OBRA}/lancar`, `/obras/medicao/${OBRA}/planilha`, "/obras/medicao-rh", "/obras/medicao-acesso", "/obras/medicao-servicos", "/obras/medicao-empreiteiros", "/obras/contratos", "/obras/contratos/novo", "/empreendimentos", `/empreendimentos/${OBRA}`, `/empreendimentos/${OBRA}?aba=dados`,
       "/documentos", `/documentos/${OBRA}`, `/documentos/${OBRA}/lote`, "/documentos/painel", "/documentos/compat", `/documentos/compat/${OBRA}`, "/documentos/plotagens", "/documentos/plotagens/solicitar",
       "/documentos/plotagens/gestao", "/documentos/materiais", `/documentos/materiais/${OBRA}`, "/documentos/locais", "/documentos/tipos", "/documentos/projetistas", "/documentos/avisos"],
     gerente: ["/app", "/projetos", "/obras/medicao", `/obras/medicao/${OBRA}?aba=aprovacao`, "/documentos/painel"],
-    eng: ["/app", "/obras/medicao", `/obras/medicao/${OBRA}?aba=boletins`, `/obras/medicao/${OBRA}/lancar`, "/documentos", `/documentos/${OBRA}`],
+    eng: ["/app", "/obras/medicao", `/obras/medicao/${OBRA}?aba=boletins`, `/obras/medicao/${OBRA}/lancar`, "/obras/contratos", "/empreendimentos", `/empreendimentos/${OBRA}`, "/documentos", `/documentos/${OBRA}`],
     "rh.teste": ["/app", "/obras/medicao-rh"],
     proj: ["/documentos", `/documentos/${OBRA}`],
   };
