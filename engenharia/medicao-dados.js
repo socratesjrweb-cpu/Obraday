@@ -393,7 +393,7 @@ export const acumuladoItem = (O, itemId, menosLanc = "") => O.boletins.reduce((a
 // ---------------------------------------------------------------- estrutura: pavimentos, locais, itens, modelos
 export function novoPavimento(obra, f, user) {
   const { O, erro } = abrir(obra); if (erro) return { erro };
-  const nomes = String(f.nome || "").split(/[\n;]/).map(txt).filter(Boolean).map(n => n.slice(0, 80));
+  const nomes = [].concat(f.nome || []).join("\n").split(/[\n;]/).map(txt).filter(Boolean).map(n => n.slice(0, 80));
   if (!nomes.length) return { erro: "Escreva o nome do pavimento (um por linha para vários)." };
   const vivos = O.pavimentos.filter(p => !p.removido), feitos = [];
   for (const nome of nomes) {
@@ -493,7 +493,7 @@ export function porNoGrupo(obra, f, user) {
 /** Locais (um por linha) em um ou vários pavimentos — ex.: "Apto 01…Apto 04" em todos os pavimentos-tipo de uma vez. */
 export function novoLocal(obra, f, user) {
   const { O, erro } = abrir(obra); if (erro) return { erro };
-  const nomes = String(f.nome || "").split(/[\n;]/).map(txt).filter(Boolean).map(n => n.slice(0, 80)), pavs = [].concat(f.pav || []).filter(Boolean);
+  const nomes = [].concat(f.nome || []).join("\n").split(/[\n;]/).map(txt).filter(Boolean).map(n => n.slice(0, 80)), pavs = [].concat(f.pav || []).filter(Boolean);
   if (!nomes.length) return { erro: "Escreva o nome do local (um por linha para vários)." };
   if (!pavs.length) return { erro: "Marque em que pavimento(s) ficam." };
   let n = 0;

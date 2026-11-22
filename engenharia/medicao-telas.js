@@ -119,14 +119,14 @@ export const CSS = `<style>
 .mc-obsi{border-top:1px dashed #e6e1d2;padding:7px 0}.mc-obsi>small{color:var(--mut)}.mc-obsi .t{white-space:pre-line;margin-top:3px;line-height:1.5}.mc-obsi .t small{color:var(--mut)}.mc-obsi .t.l{color:#4a4a52;font-size:12px}
 .mc-obsi .mc-fotos img{height:64px}
 .soprint{display:none}@media print{.soprint{display:block}}
-.mc-dlg{border:0;border-radius:16px;padding:18px 20px;width:min(520px,92vw);margin:auto;inset:0;position:fixed;height:fit-content;max-height:90vh;overflow:auto;box-shadow:0 18px 48px rgba(0,0,0,.3)}.mc-dlg::backdrop{background:rgba(23,23,27,.45)}
+.mc-dlg{box-sizing:border-box;border:0;border-radius:16px;padding:18px 20px;width:min(520px,92vw);margin:auto;inset:0;position:fixed;height:fit-content;max-height:90vh;overflow:auto;box-shadow:0 18px 48px rgba(0,0,0,.3)}.mc-dlg::backdrop{background:rgba(23,23,27,.45)}
 details.mc-add{margin-top:12px}details.mc-add>summary{list-style:none;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border:1.5px dashed #d8c78f;border-radius:10px;background:#fffcf2;color:#6a5310;font-size:13px;font-weight:700;cursor:pointer}
 details.mc-add>summary::-webkit-details-marker{display:none}details.mc-add>summary::before{content:"+";display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:999px;background:var(--acento);color:#fff;font-size:15px;line-height:1}
 details.mc-add>summary:hover{border-style:solid;border-color:var(--acento);background:#fbf3dd}details.mc-add[open]>summary{border-style:solid;border-color:var(--acento);background:#fbf3dd;border-radius:10px 10px 0 0}
 details.mc-add[open]>form,details.mc-add[open]>div{border:1.5px solid var(--acento);border-radius:0 10px 10px 10px;padding:12px 14px;margin-top:-1.5px;background:#fff}
 .mc-novo{display:inline-flex;align-items:center;gap:7px}.mc-novo::before{content:"+";display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:999px;background:rgba(255,255,255,.25);font-size:15px;line-height:1}
 .mc-conf{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.mc-conf td{padding:7px 6px;border-top:1px solid #eee9da;vertical-align:middle}.mc-conf .ok{color:#1f6b3a;font-weight:700}.mc-conf .nao{color:#a8321f;font-weight:700}
-.mc-dlg.lg{width:min(680px,94vw)}
+.mc-dlg.lg{width:min(680px,94vw)}@media(max-width:520px){.mc-dlg,.mc-dlg.lg{width:96vw;padding:16px 14px}}
 .mc-arvore{display:flex;flex-direction:column;gap:8px}.mc-arg{display:flex;flex-direction:column;gap:5px;margin:6px 0 4px 10px}
 details.mc-ar{border:1px solid #e6e0cf;border-radius:10px;background:#fff;overflow:hidden}details.mc-ar>summary{display:flex;gap:8px;align-items:center;flex-wrap:wrap;list-style:none;cursor:pointer;padding:7px 10px;user-select:none}
 details.mc-ar>summary::-webkit-details-marker{display:none}details.mc-ar>summary .nm{font-weight:800}details.mc-ar>summary small{color:var(--mut);font-weight:600;font-size:12px}
@@ -483,7 +483,7 @@ export function paginaEntrada(user, { m = "", e = "" } = {}) {
         : `<div style="margin-top:8px;font-size:12px;color:var(--mut)">A engenharia ou a Diretoria começa esta obra aqui.</div>`}</div>`;
   }).join("");
   const body = `${CSS_ORC}${CSS}${JS}
-  <a class="pg-volta" href="/obras"><span class="seta">←</span> Obras / Suprimentos</a>
+  <a class="pg-volta" href="/engenharia"><span class="seta">←</span> Engenharia</a>
   <div class="oc-topo"><h1>📏 Medições</h1><span style="margin-left:auto"></span>${D.podeRH(user) ? `<a class="oc-btn p" href="/obras/medicao-rh">🧾 Painel do RH</a>` : ""}<a class="oc-btn p" href="/obras/medicao-servicos">📋 Cadastro de serviços</a><a class="oc-btn p" href="/obras/medicao-empreiteiros">👷 Cadastro de empreiteiros</a></div>
   ${aviso(m, e)}
   <div class="oc-painel pg-limpa" style="border-top:1px solid #ece8dc;border-radius:16px;margin-top:16px">
@@ -950,12 +950,52 @@ function abaEstrutura(R, user, q) {
       <div class="bt">${fechar}<button type="button" class="oc-btn p" onclick="mcSvAvanca()">Adicionar</button></div></div>
     <div id="mcSvP2" hidden><div id="mcSvResumo"></div>
       <div class="bt"><button type="button" class="oc-btn" onclick="mcSvVolta()">Voltar e corrigir</button><button class="oc-btn p">Confirmar e adicionar</button></div></div></form>`);
-  const dlgPav = dlg("mcDlgPav", "Adicionar pavimentos", `<form method="POST" action="${b}/pavimento" style="display:block;margin:0">
-    <textarea name="nome" rows="6" class="mc-i" placeholder="Um por linha, de baixo para cima. Ex.:&#10;Térreo&#10;Tipo 01&#10;Tipo 02"></textarea>
-    <div style="font-size:12px;color:var(--mut);margin-top:4px">Entram acima do último pavimento. Depois é só pôr no grupo certo (botão “Grupos de pavimentos”).</div>
+  // ---- 22/11: pavimentos e locais em LINHAS (um campo por nome), no lugar da caixa "um por linha". Pensado para o celular na obra:
+  // campo grande, Enter pula para o próximo (e cria um novo no fim), ✕ tira a linha, colar uma lista do Excel vira várias linhas,
+  // e "Gerar em série" monta Tipo 01…Tipo 20 de uma vez (o número no nome é o que liga a replicação nos pavimentos tipo).
+  const linhaUma = (ph, i) => `<div class="mc-lin-r"><span class="mc-lin-n">${i + 1}</span><input name="nome" class="mc-i mc-lin-i" maxlength="80" autocomplete="off" placeholder="${esc(ph)}" onkeydown="mcLinTecla(event,this)" onpaste="mcLinCola(event,this)"><button type="button" class="mc-lin-x" title="Tirar esta linha" aria-label="Tirar esta linha" onclick="mcLinTira(this)">✕</button></div>`;
+  const linhas = (oque, phs) => `<div class="mc-lin">${phs.map(linhaUma).join("")}</div>
+    <button type="button" class="mc-mini mc-lin-mais" onclick="mcLinMais(this.previousElementSibling,true)">+ outro ${oque}</button>`;
+  const serie = pre => `<details class="mc-lin-s"><summary>Gerar em série (ex.: ${esc(pre)} 01 até ${esc(pre)} 10)</summary>
+    <div class="mc-lin-sg"><input class="mc-i" value="${esc(pre)}" aria-label="Nome" placeholder="Nome"><span>de</span><input class="mc-i" type="number" inputmode="numeric" min="0" value="1" aria-label="Do número"><span>até</span><input class="mc-i" type="number" inputmode="numeric" min="0" value="10" aria-label="Até o número"><button type="button" class="oc-btn" onclick="mcLinSerie(this)">Gerar</button></div></details>`;
+  const LIN_CSS_JS = `<style>
+    .mc-lin{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;padding:2px}
+    .mc-lin-r{display:flex;align-items:center;gap:6px}
+    .mc-lin-n{min-width:22px;text-align:right;font-size:12px;font-weight:700;color:var(--mut);font-variant-numeric:tabular-nums}
+    .mc-lin-i{flex:1;font-size:16px;padding:10px 12px;min-height:44px}
+    .mc-lin-x{flex:none;width:44px;height:44px;border:1px solid #e0d9c4;border-radius:10px;background:#fff;color:#8a2d2d;font-size:16px;cursor:pointer}
+    .mc-lin-x:hover{background:#fbeeee}
+    .mc-lin-mais{margin:8px 0 0 28px;padding:9px 14px;font-size:13px}
+    .mc-lin-s{margin:12px 0 0;font-size:13px}.mc-lin-s summary{cursor:pointer;color:var(--acento-escuro,#7a1f1f);font-weight:700;padding:6px 0}
+    .mc-lin-sg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+    .mc-lin-sg input{width:84px;font-size:16px;padding:8px 10px}.mc-lin-sg input:first-child{width:130px}
+  </style><script>
+    function mcLinNum(box){ box.querySelectorAll('.mc-lin-n').forEach(function(n,i){ n.textContent=i+1; }); }
+    function mcLinMais(box,foca,valor){ var r=box.querySelector('.mc-lin-r').cloneNode(true), i=r.querySelector('input'); i.value=valor||''; i.placeholder=''; box.appendChild(r); mcLinNum(box); if(foca){ i.focus(); r.scrollIntoView({block:'nearest'}); } return i; }
+    function mcLinTira(b){ var r=b.closest('.mc-lin-r'), box=r.parentNode; if(box.querySelectorAll('.mc-lin-r').length>1) r.remove(); else r.querySelector('input').value=''; mcLinNum(box); }
+    function mcLinTecla(e,i){ if(e.key!=='Enter') return; e.preventDefault(); var r=i.closest('.mc-lin-r'), prox=r.nextElementSibling;
+      if(prox) prox.querySelector('input').focus(); else if(i.value.trim()) mcLinMais(r.parentNode,true); }
+    function mcLinCola(e,i){ var t=(e.clipboardData||window.clipboardData).getData('text'); if(!/[\\n;\\t]/.test(t)) return; e.preventDefault();
+      var ns=t.split(/[\\r\\n;\\t]+/).map(function(x){ return x.trim(); }).filter(Boolean); if(!ns.length) return;
+      var box=i.closest('.mc-lin'); i.value=ns.shift(); var vazias=[].slice.call(box.querySelectorAll('input')).filter(function(x){ return x!==i && !x.value.trim(); });
+      ns.forEach(function(n){ var v=vazias.shift(); if(v) v.value=n; else mcLinMais(box,false,n); }); mcLinNum(box); }
+    function mcLinSerie(b){ var c=b.parentNode.querySelectorAll('input'), pre=c[0].value.trim(), de=parseInt(c[1].value,10), ate=parseInt(c[2].value,10);
+      if(!pre||isNaN(de)||isNaN(ate)||ate<de){ alert('Confira o nome e os números (o “até” não pode ser menor que o “de”).'); return; }
+      if(ate-de>199){ alert('No máximo 200 de uma vez.'); return; }
+      var box=b.closest('form').querySelector('.mc-lin'), vazias=[].slice.call(box.querySelectorAll('input')).filter(function(x){ return !x.value.trim(); }), w=String(ate).length<2?2:String(ate).length;
+      for(var k=de;k<=ate;k++){ var n=pre+' '+String(k).padStart(w,'0'), v=vazias.shift(); if(v) v.value=n; else mcLinMais(box,false,n); }
+      vazias.forEach(function(v){ if(box.querySelectorAll('.mc-lin-r').length>1) v.closest('.mc-lin-r').remove(); }); mcLinNum(box); b.closest('details').open=false; }
+    function mcLinValida(f){ var ok=[].some.call(f.querySelectorAll('.mc-lin input'),function(x){ return x.value.trim(); }); if(!ok){ alert('Preencha pelo menos um nome.'); f.querySelector('.mc-lin input').focus(); } return ok; }
+  </script>`;
+  const dlgPav = dlg("mcDlgPav", "Adicionar pavimentos", `<form method="POST" action="${b}/pavimento" style="display:block;margin:0" onsubmit="return mcLinValida(this)">
+    ${LIN_CSS_JS}<div style="font-size:12.5px;color:var(--mut);margin:0 0 8px">Um pavimento por campo, <b>de baixo para cima</b> (o 1º é o mais baixo). Entram acima do último pavimento; depois é só pôr no grupo certo (botão “Grupos de pavimentos”).</div>
+    ${linhas("pavimento", ["Ex.: Térreo", "Ex.: Tipo 01", "Ex.: Tipo 02"])}
+    ${serie("Tipo")}
     <div class="bt">${fechar}<button class="oc-btn p">Cadastrar</button></div></form>`);
-  const dlgLoc = dlg("mcDlgLoc", "Adicionar locais", `<form method="POST" action="${b}/local" style="display:block;margin:0">
-    <textarea name="nome" rows="5" class="mc-i" placeholder="Um por linha. Ex.:&#10;Apto 01&#10;Apto 02&#10;Hall"></textarea>
+  const dlgLoc = dlg("mcDlgLoc", "Adicionar locais", `<form method="POST" action="${b}/local" style="display:block;margin:0" onsubmit="return mcLinValida(this)">
+    <div style="font-size:12.5px;color:var(--mut);margin:0 0 8px">Um local por campo.</div>
+    ${linhas("local", ["Ex.: Apto 01", "Ex.: Apto 02", "Ex.: Hall"])}
+    ${serie("Apto")}
     ${lab("Em quais pavimentos")}<div class="mc-arv">${blocos.map(({ g, pavs }) => `<div class="mc-avg">${vivosGr.length ? `<label class="gt"><input type="checkbox" onchange="var v=this.checked;this.closest('.mc-avg').querySelectorAll('input[name=pav]').forEach(function(c){c.checked=v;})">${g ? esc(g.nome) : "Sem grupo"}</label>` : ""}
       <div class="oc-chks" style="padding:2px 0 6px 22px">${pavs.map(p => `<label><input type="checkbox" name="pav" value="${esc(p.id)}">${esc(p.nome)}</label>`).join("")}</div></div>`).join("")}</div>
     <div class="bt">${fechar}<button class="oc-btn p">Cadastrar</button></div></form>`);

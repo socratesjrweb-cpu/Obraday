@@ -237,6 +237,8 @@ table.dre tr:last-child td{border-bottom:0}
 .simlink:hover{filter:brightness(1.05)}
 @media(max-width:760px){.sim-wrap{grid-template-columns:1fr}}
 @media(max-width:520px){.hello{font-size:20px}.wrap{padding:20px 16px 50px}}
+/* 22/11: no celular o topo não estoura a largura (ele alargava a página inteira e empurrava as janelas para fora da tela) */
+@media(max-width:640px){.topbar{flex-wrap:wrap;gap:8px;padding:10px 14px}.topbar .right{flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-left:auto}.topbar .sair{padding:7px 10px}.userchip{padding:4px}.userchip .nm{display:none}}
 `;
 const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const logoOuNome = () => M.logo ? `<img class="logo" src="${esc(M.logo)}" alt="${esc(M.nome)}">` : `<div class="login-nome">${esc(M.nome)}</div>`;

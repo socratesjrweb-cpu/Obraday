@@ -1,4 +1,4 @@
-// medicao-chave.js — QUAL versão das Medições o quadro de Obras / Suprimentos abre (03/11/2026).
+// medicao-chave.js — QUAL versão das Medições o painel de Engenharia abre (03/11/2026).
 //
 //   true  → a versão NOVA (/obras/medicao): obra em estrutura e modelos, folha de medição em grade, boletim do mês,
 //           cadastro único de empreiteiros e o dashboard. É a que vale desde 04/11/2026.
